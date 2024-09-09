@@ -1,8 +1,0 @@
-flask
-pymongo
-flask_cors
-mediapipe
-imutils
-C:\Users\MAHARSHI_PATEL\Desktop\Akshar_FaceRecoginition\face-recognition-flask\dlib-19.24.99-cp312-cp312-win_amd64.whl
-face_recognition
-pillow
