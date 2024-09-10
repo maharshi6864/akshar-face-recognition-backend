@@ -147,10 +147,8 @@ def register_student():
         file = request.files.get('face_image')
         if not file:
             return jsonify({"message": "No file uploaded"}), 400
-
         
-
-          # Save the uploaded file temporarily
+        # Save the uploaded file temporarily
         filename = secure_filename(file.filename)
         filepath = os.path.join(app.config['FACE_IMAGES'],filename)
         file.save(filepath)
@@ -161,6 +159,7 @@ def register_student():
         # Load the image using OpenCV
         
         if image is None:
+            os.remove(filepath)
             return jsonify({"message": "Could not read image"}), 400
 
         # Initialize MediaPipe Face Detection
@@ -173,6 +172,7 @@ def register_student():
 
             # Check if faces are detected
             if not results.detections:
+                os.remove(filepath)
                 return jsonify({"message": "No faces detected"}), 400
 
             # Annotate the image with detected faces
@@ -196,11 +196,6 @@ def register_student():
                 "file_path":filepath
             })
             
-            # Save the annotated image
-            # annotated_filepath = f'/tmp/annotated_{filename}'
-            # cv2.imwrite(annotated_filepath, annotated_image)
-
-        # Return a success response
         return jsonify({"message": "success"}), 200
 
     except Exception as ex:
@@ -226,11 +221,88 @@ def get_student_details():
     student=student_dao.find_student_by_id(student_id)
     if '_id' in student:
                     student['_id'] = str(student['_id'])
+    if 'file_path' in student:  
+                    student['file_path']=student['file_path'].split('base')[1]
     return jsonify({
-        "message":"student Deleted Successfully",
+        "message":"student details fetched Successfully",
         "student_detail":student,
         "status":"true"
     })
+
+@app.route('/update_student', methods=["POST"])
+def update_student():
+    student_dao=StudentVo()
+    enrollment_no = request.form.get('enrollment_no')
+    _id = request.form.get('_id')
+    full_name = request.form.get('full_name')
+    gender = request.form.get('gender')
+    age = request.form.get('age')
+    file = request.files.get('face_image')
+    if not file:
+        student_dao.update_student(_id,{"full_name":full_name,
+                                        "gender":gender,"age":age,"enrollment_no":enrollment_no})
+        return jsonify({
+        "message":"student details updated without changing image Successfully",
+        "status":"true"
+    })
+       
+       
+    # getting previous file_path and deleting it.
+   
+
+    #Saving the new file 
+    filename = secure_filename(file.filename)
+    filepath = os.path.join(app.config['FACE_IMAGES'],filename)
+    file.save(filepath)
+
+    # Load the image using OpenCV
+    image = cv2.imread(filepath)
+    
+    # Load the image using OpenCV
+    
+    if image is None:
+        try:
+             os.remove(filepath)
+        except Exception :
+            print("Failed to remove the file")
+        return jsonify({"message": "Could not read image"}), 400
+
+    # Initialize MediaPipe Face Detection
+    mp_face_detection = mp.solutions.face_detection
+    mp_drawing = mp.solutions.drawing_utils
+
+    with mp_face_detection.FaceDetection(model_selection=1, min_detection_confidence=0.5) as face_detection:
+        # Convert the BGR image to RGB and process it with MediaPipe Face Detection
+        results = face_detection.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+
+        # Check if faces are detected
+        if not results.detections:
+            try:
+                 os.remove(filepath)
+            except Exception :
+                print("Failed to remove the file")
+            return jsonify({"message": "No faces detected"}), 400
+
+        # Annotate the image with detected faces
+        annotated_image = image.copy()
+        for detection in results.detections:
+            print('Nose tip:')
+            print(mp_face_detection.get_key_point(
+                detection, mp_face_detection.FaceKeyPoint.NOSE_TIP))
+            mp_drawing.draw_detection(annotated_image, detection)
+        previous_file_path=student_dao.find_student_by_id(_id)['file_path']
+        try:
+             os.remove(previous_file_path)        
+        except Exception:
+             print("Failed to remove the previous image.")
+        student_dao.update_student(_id,{"full_name":full_name,
+                                        "gender":gender,"age":age,"enrollment_no":enrollment_no,"file_path":filepath})
+        return jsonify({
+        "message":"student details updated with image changed Successfully",
+        "status":"true"
+    })
+ 
+    
 
 
 
