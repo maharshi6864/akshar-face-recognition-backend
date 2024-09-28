@@ -4,24 +4,24 @@ from pymongo import MongoClient
 
 from base import app,db
 
-class StudentVo(object):
+class UserVo(object):
 
     def __init__(self):
-        self.collection=db.student_vo
+        self.collection=db.user_vo
 
-    def insert_student(self, student_data):
-        self.collection.insert_one(student_data)
+    def insert_user(self, user_data):
+        self.collection.insert_one(user_data)
 
-    def find_student_by_id(self, student_id):
-        return self.collection.find_one({"_id": ObjectId(student_id)})
+    def find_user_by_id(self, user_id):
+        return self.collection.find_one({"_id": ObjectId(user_id)})
 
-    def update_student(self, student_id, updated_data):
-        self.collection.update_one({"_id": ObjectId(student_id)}, {"$set": updated_data})
+    def update_user(self, user_id, updated_data):
+        self.collection.update_one({"_id": ObjectId(user_id)}, {"$set": updated_data})
 
-    def delete_student(self, student_id):
+    def delete_user(self, student_id):
         self.collection.delete_one({"_id": ObjectId(student_id)})
 
-    def list_students(self):
+    def list_user(self):
         return list(self.collection.find())
     
     

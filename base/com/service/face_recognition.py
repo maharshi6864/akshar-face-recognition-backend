@@ -22,7 +22,7 @@ def facial_recognition():
   # determine faces from encodings.pickle file model created from train_model.py
   encodingsP = "encodings.pickle"
   # use this xml file
-  cascade = "C:/Users/MAHARSHI_PATEL/Desktop/Akshar_FaceRecoginition/face-recognition-flask/base/com/service/haarcascade_frontalface_default.xml"
+  cascade = "C:/Users/MAHARSHI_PATEL/Desktop/Akshar_fullStack/askhar-python/base/com/service/haarcascade_frontalface_default.xml"
   print("[INFO] loading encodings + face detector...")
   data = pickle.loads(open(encodingsP, "rb").read())
   detector = cv2.CascadeClassifier(cascade)
@@ -30,7 +30,6 @@ def facial_recognition():
   # initialize the video stream and allow the camera sensor to warm up
   print("[INFO] starting video stream...")
   vs = VideoStream(src=0).start()
-  #vs = VideoStream(usePiCamera=True).start()
   time.sleep(2.0)
 
   # start the FPS counter
@@ -68,7 +67,7 @@ def facial_recognition():
       # encodings
       matches = face_recognition.compare_faces(data["encodings"],
         encoding)
-      name = "UNKOWN" # if face is not recognized, then print Unknown
+      name = "UNKNOWN" # if face is not recognized, then print Unknown
 
       # check to see if we have found a match
       if True in matches:
@@ -93,9 +92,9 @@ def facial_recognition():
         if currentname != name:
           currentname = name
 
-          student_vo = student_dao.find_student_by_id(currentname)
-          attendence_dao.update_student_by_student_id(currentname,{"status":"present"})
-          print(student_vo['full_name'])
+          # student_vo = student_dao.find_student_by_id(currentname)
+          # attendence_dao.update_student_by_student_id(currentname,{"status":"present"})
+          # print(student_vo)
 
       
       # update the list of names

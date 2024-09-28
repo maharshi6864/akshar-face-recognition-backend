@@ -14,3 +14,4 @@ coverage==4.1
 Sphinx==1.4.8
 cryptography==1.7
 PyYAML==5.1
+numpy==1.26.4

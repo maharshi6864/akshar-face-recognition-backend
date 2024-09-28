@@ -13,7 +13,7 @@ app.secret_key = 'gazwsxedcrfvtgbyhnujmik10p123456 '
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 client = MongoClient("mongodb://localhost:27017") #host uri
 db = client.aksharDB
-CORS(app, resources={r"*": {"origins": "*"}})
+CORS(app, origins=["*"])
 
 app.app_context().push()
 

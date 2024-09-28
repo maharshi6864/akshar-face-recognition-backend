@@ -137,12 +137,7 @@ def getStudents():
 @app.route('/register-student', methods=["POST"])
 def register_student():
     try:
-        # Capture form data
-        enrollment_no = request.form.get('enrollment_no')
-        full_name = request.form.get('full_name')
-        gender = request.form.get('gender')
-        age = request.form.get('age')
-
+        
         # Handle file upload
         file = request.files.get('face_image')
         if not file:
@@ -186,17 +181,9 @@ def register_student():
                 mp_drawing.draw_detection(annotated_image, detection)
             # Save the uploaded file temporarily
             
-            student_vo=StudentVo()
-
-            student_vo.insert_student({
-                "enrollment_no":enrollment_no,
-                "full_name":full_name,
-                "gender":gender,
-                "age":age,
-                "file_path":filepath
-            })
+           
             
-        return jsonify({"message": "success"}), 200
+        return jsonify({"message": "success","filePath":filepath}), 200
 
     except Exception as ex:
         print(f"Exception: {ex}")
